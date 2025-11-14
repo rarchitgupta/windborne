@@ -11,7 +11,7 @@ import {
 } from "react-simple-maps";
 import type { LocationPoint } from "@/lib/queries/location-data";
 import { scaleLinear } from "d3-scale";
-import { useCsvData } from "@/lib/queries/csv-data";
+import { useCsvData, type CsvRow } from "@/lib/queries/csv-data";
 
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
@@ -21,8 +21,10 @@ type Props = {
 };
 
 export default function WorldMap({ points, dataset }: Props) {
-  const csvQuery = dataset ? useCsvData(dataset) : null;
-  const csv = csvQuery?.data ?? [];
+  // Always call the hook to preserve hooks order. When dataset is undefined,
+  // default to "vulnerability" to avoid conditional hook calls (minimal change).
+  const csvQuery = useCsvData(dataset ?? "vulnerability");
+  const csv = dataset ? csvQuery?.data ?? [] : [];
 
   // pick last numeric column (skip ISO3/Name)
   let yearKey: string | null = null;
@@ -56,9 +58,9 @@ export default function WorldMap({ points, dataset }: Props) {
   if (dataset === "food") colorRange = ["#fff9db", "#ffd54f"]; // yellow-ish
   if (dataset === "water") colorRange = ["#e6f7ff", "#2b8cff"]; // blue-ish
 
-  // Avoid generic typing confusion inside TSX: coerce the d3 scale to `any`
-  const _linear: any = scaleLinear();
-  const scale = _linear
+  // Create a typed linear scale that maps numbers to color strings
+  const linear = scaleLinear<string>();
+  const scale = linear
     .domain([domainMin, domainMax])
     .range([colorRange[0], colorRange[1]]) as unknown as (v: number) => string;
 
@@ -100,7 +102,7 @@ export default function WorldMap({ points, dataset }: Props) {
                       .trim();
 
                   // First, try to find a row by ISO3 (if available on the geo)
-                  let row = null as any | null;
+                  let row: CsvRow | null = null;
                   if (isoFromProps) {
                     row =
                       csv.find((s) => {
@@ -142,7 +144,7 @@ export default function WorldMap({ points, dataset }: Props) {
                       }) || null;
                   }
 
-                  const iso = isoFromProps || String(geo.id || "");
+                  // iso value was previously used only for debug logs; omit to avoid unused-var
                   const valueRaw = yearKey ? row?.[yearKey] : undefined;
                   const valueNum =
                     valueRaw != null && valueRaw !== ""

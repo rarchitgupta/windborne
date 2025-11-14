@@ -15,7 +15,7 @@ export function HourExplorer() {
   const [dataset, setDataset] = useState<"food" | "water" | "vulnerability">(
     "vulnerability"
   );
-  const { data, isLoading, isError, error, refetch } = useLocationHour(hour);
+  const { data } = useLocationHour(hour);
 
   return (
     <SidebarProvider>

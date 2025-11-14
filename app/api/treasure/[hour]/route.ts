@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-export async function GET(req: Request, _ctx: any) {
+export async function GET(req: Request) {
   // Avoid using the `params` object directly (Next warns it must be awaited in
   // some environments). Extract hour from the request path instead.
   const url = new URL(req.url);
@@ -17,17 +17,17 @@ export async function GET(req: Request, _ctx: any) {
     const text = await r.text();
 
     // Try parse; if malformed, attempt lightweight repair (extract first top-level array)
-    let parsed: any;
+    let parsed: unknown;
     try {
       parsed = JSON.parse(text);
-    } catch (e) {
+    } catch (_e) {
       const first = text.indexOf("[");
       const last = text.lastIndexOf("]");
       if (first !== -1 && last !== -1 && last > first) {
         const sub = text.slice(first, last + 1);
         try {
           parsed = JSON.parse(sub);
-        } catch (e2) {
+        } catch (_e2) {
           // fall through
         }
       }
@@ -42,7 +42,10 @@ export async function GET(req: Request, _ctx: any) {
     }
 
     return NextResponse.json(parsed, { status: 200 });
-  } catch (err) {
-    return NextResponse.json({ error: "upstream fetch failed" }, { status: 502 });
+  } catch (_err) {
+    return NextResponse.json(
+      { error: "upstream fetch failed" },
+      { status: 502 }
+    );
   }
 }

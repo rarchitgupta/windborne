@@ -16,10 +16,10 @@ async function fetchHourData(hour: number): Promise<LocationPoint[]> {
     const res = await fetch(url);
     const text = await res.text();
     // Try parse JSON directly first
-    let parsed: any;
+    let parsed: unknown;
     try {
       parsed = JSON.parse(text);
-    } catch (err) {
+    } catch (_err) {
       // Attempt lightweight repair: extract first top-level array
       const first = text.indexOf("[");
       const last = text.lastIndexOf("]");
@@ -27,14 +27,14 @@ async function fetchHourData(hour: number): Promise<LocationPoint[]> {
         const sub = text.slice(first, last + 1);
         try {
           parsed = JSON.parse(sub);
-        } catch (err2) {
+        } catch (_err2) {
           // fall through to throwing below
         }
       }
     }
     if (!Array.isArray(parsed)) return [];
     const out: LocationPoint[] = [];
-    for (const item of parsed) {
+    for (const item of parsed as unknown[]) {
       if (!Array.isArray(item) || item.length < 2) continue;
       // API appears to return [lon, lat, alt]
       const lon = Number(item[0]);
@@ -48,7 +48,7 @@ async function fetchHourData(hour: number): Promise<LocationPoint[]> {
       if (!isFinite(lat) || !isFinite(lon)) continue;
       out.push({ lat, lon, alt });
     }
-    return out;
+  return out;
   } catch (err) {
     // On any error return empty array so UI can handle gracefully
     return [];
