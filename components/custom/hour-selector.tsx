@@ -31,7 +31,7 @@ export function HourSelector({
   return (
     <Select value={selectedValue} onValueChange={handleChange}>
       <SelectTrigger className="w-full">
-        <SelectValue placeholder="Hour (0-23)" />
+        <SelectValue placeholder="Hour (0-23)">{selectedValue}</SelectValue>
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>

@@ -51,7 +51,6 @@ async function fetchHourData(hour: number): Promise<LocationPoint[]> {
     return out;
   } catch (err) {
     // On any error return empty array so UI can handle gracefully
-    console.warn(`fetchHourData(${hour}) failed:`, err);
     return [];
   }
 }

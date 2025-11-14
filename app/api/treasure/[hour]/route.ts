@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 
-export async function GET(
-  req: Request,
-  { params }: { params: { hour: string } }
-) {
-  const rawHour = params.hour ?? "00";
-  const hh = rawHour.padStart(2, "0").slice(0, 2);
+export async function GET(req: Request, _ctx: any) {
+  // Avoid using the `params` object directly (Next warns it must be awaited in
+  // some environments). Extract hour from the request path instead.
+  const url = new URL(req.url);
+  const parts = url.pathname.split("/").filter(Boolean);
+  const rawHour = parts[parts.length - 1] ?? "00";
+  const hh = String(rawHour).padStart(2, "0").slice(0, 2);
   const upstream = `https://a.windbornesystems.com/treasure/${hh}.json`;
 
   try {
@@ -42,7 +43,6 @@ export async function GET(
 
     return NextResponse.json(parsed, { status: 200 });
   } catch (err) {
-    console.warn("/api/treasure proxy error", err);
     return NextResponse.json({ error: "upstream fetch failed" }, { status: 502 });
   }
 }
