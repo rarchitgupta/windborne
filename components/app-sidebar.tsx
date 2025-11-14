@@ -88,14 +88,14 @@ export function AppSidebar({
       <SidebarFooter>
         <div className="items-center justify-between gap-2 p-2">
           <a
-            href="#"
+            href="https://github.com/rarchitgupta/windborne"
             className="flex items-center gap-2 text-sm text-sidebar-foreground/80 hover:underline justify-center my-4"
           >
             <Github className="size-6" />
           </a>
           <div className="text-sm text-sidebar-foreground/70 flex items-center gap-2 justify-center">
             built with <span aria-hidden>❤️</span> by{" "}
-            <a href="#" className="underline">
+            <a href="https://www.architgupta.dev" className="underline">
               Archit Gupta
             </a>
           </div>
